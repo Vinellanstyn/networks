@@ -9,6 +9,13 @@ UPSHOT_WALLET_NAME="upshot"
 UPSHOT_WALLET_TOKENS=$(echo '99*10^18' | bc)
 FAUCET_WALLET_NAME="faucet"
 FAUCET_WALLET_TOKENS=$(echo '10^18' | bc)
+# These numbers should match the Token distribution schedule described in the whitepaper
+FOUNDATION_WALLET_NAME="foundation"
+FOUNDATION_WALLET_TOKENS=$(echo '10^26' | bc) # 10% of total token supply of 1e27
+INVESTORS_WALLET_NAME="investors"
+INVESTORS_WALLET_TOKENS=$(echo '3.105*10^26' | bc | cut -f 1 -d '.') # 31.05% of total token supply of 1e27
+TEAM_WALLET_NAME="team"
+TEAM_WALLET_TOKENS=$(echo '1.75*10^26' | bc | cut -f 1 -d '.') # 17.5% of total token supply of 1e27
 
 VALIDATOR_TOKENS=$(echo '(10^26 - 100*10^18)/3' | bc)
 COMMON_HOME_DIR="${COMMON_HOME_DIR:-$(pwd)}"
@@ -53,6 +60,33 @@ $allorad --home=$genesisHome keys add $FAUCET_WALLET_NAME \
 echo "Fund $FAUCET_WALLET_NAME account"
 $allorad --home=$genesisHome genesis add-genesis-account \
     $FAUCET_WALLET_NAME ${FAUCET_WALLET_TOKENS}${DENOM} \
+    --keyring-backend $keyringBackend
+
+echo "Generate $FOUNDATION_WALLET_NAME account"
+$allorad --home=$genesisHome keys add $FOUNDATION_WALLET_NAME \
+    --keyring-backend $keyringBackend > $COMMON_HOME_DIR/$FOUNDATION_WALLET_NAME.account_info 2>&1
+
+echo "Fund $FOUNDATION_WALLET_NAME account"
+$allorad --home=$genesisHome genesis add-genesis-account \
+    $FOUNDATION_WALLET_NAME ${FOUNDATION_WALLET_TOKENS}${DENOM} \
+    --keyring-backend $keyringBackend
+
+echo "Generate $INVESTORS_WALLET_NAME account"
+$allorad --home=$genesisHome keys add $INVESTORS_WALLET_NAME \
+    --keyring-backend $keyringBackend > $COMMON_HOME_DIR/$INVESTORS_WALLET_NAME.account_info 2>&1
+
+echo "Fund $INVESTORS_WALLET_NAME account"
+$allorad --home=$genesisHome genesis add-genesis-account \
+    $INVESTORS_WALLET_NAME ${INVESTORS_WALLET_TOKENS}${DENOM} \
+    --keyring-backend $keyringBackend
+
+echo "Generate $TEAM_WALLET_NAME account"
+$allorad --home=$genesisHome keys add $TEAM_WALLET_NAME \
+    --keyring-backend $keyringBackend > $COMMON_HOME_DIR/$TEAM_WALLET_NAME.account_info 2>&1
+
+echo "Fund $TEAM_WALLET_NAME account"
+$allorad --home=$genesisHome genesis add-genesis-account \
+    $TEAM_WALLET_NAME ${TEAM_WALLET_TOKENS}${DENOM} \
     --keyring-backend $keyringBackend
 
 for ((i=0; i<$VALIDATOR_NUMBER; i++)); do
